@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pixley — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream:     "#FFF6E8",
+          sand:      "#F6E4C6",
+          coral:     "#F25F5C",
+          teal:      "#2EC4A2",
+          sunshine:  "#FFC857",
+          cocoa:     "#2B1D12",
+          warmbrown: "#7A5F4B",
+          coraltint: "#FCEBEB",
+          bluetint:  "#E6F1FB",
+          greentint: "#EAF3DE",
+        },
+        fontFamily: { sans: ["Poppins", "system-ui", "sans-serif"] },
+        borderRadius: { card: "16px", video: "20px" },
+        maxWidth: { page: "1200px" },
+      },
+    },
+  };
+</script>
+<style>
+  html, body { background-color: #FFF6E8; color: #2B1D12; font-family: 'Poppins', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .preview-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    background: #2B1D12; color: #FFF6E8;
+    text-align: center; font-size: 12px; padding: 6px 12px; letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body class="bg-cream text-cocoa font-sans">
+
+<div class="preview-banner">Local preview · usepixley.com rebuild · open in any browser</div>
+<div style="height: 28px;"></div>
+
+<!-- Header -->
+<header class="w-full border-b border-sand bg-cream">
+  <div class="mx-auto flex max-w-page items-center justify-between px-6 py-4">
+    <a href="#" class="flex items-center gap-2" aria-label="Pixley home">
+      <span class="text-2xl font-bold tracking-wide text-coral">PIXLEY</span>
+    </a>
+    <nav class="flex items-center gap-3">
+      <a href="#contact" class="rounded-full px-4 py-2 text-sm font-medium text-cocoa hover:bg-sand/60 transition-colors">Contact</a>
+      <a href="#download" class="rounded-full bg-coral px-5 py-2 text-sm font-bold text-cream hover:opacity-90 transition-opacity">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <section class="mx-auto max-w-page px-6 pt-12 pb-16 md:pt-20 md:pb-24">
+    <div class="grid items-center gap-12 md:grid-cols-2">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-wide text-warmbrown">Never wonder what your child is watching</p>
+        <h1 class="mt-4 text-4xl font-bold leading-tight text-cocoa md:text-6xl">
+          Parental controls for <span class="text-coral">Shorts &amp; Reels</span>
+        </h1>
+        <p class="mt-6 max-w-md text-lg text-warmbrown">
+          A kid-safe streaming app where you approve every channel.
+          No algorithm. No suggested content. Just the videos you&rsquo;ve said yes to.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a id="download" href="#download" class="rounded-full bg-coral px-6 py-3 text-base font-bold text-cream hover:opacity-90 transition-opacity">Download Now</a>
+          <a href="#features" class="rounded-full border-2 border-coral px-6 py-3 text-base font-bold text-coral hover:bg-coraltint transition-colors">Learn More</a>
+        </div>
+      </div>
+      <div class="relative flex justify-center md:justify-end">
+        <!-- Phone frame containing real Videos screenshot -->
+        <div class="relative w-[280px] md:w-[320px]">
+          <div class="relative rounded-[44px] border-[12px] border-cocoa bg-cocoa shadow-xl">
+            <div class="absolute left-1/2 top-0 z-10 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-cocoa"></div>
+            <div class="overflow-hidden rounded-[32px] bg-cocoa">
+              <img
+                src="public/screenshots/02-videos.png"
+                alt="The Pixley Videos library"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                class="block h-auto w-full"
+              />
+              <!-- Fallback shown if file missing -->
+              <div style="display:none" class="aspect-[3/6.5] flex-col items-center justify-center bg-cocoa text-cream/60 text-center p-6">
+                <div class="text-4xl mb-3">📱</div>
+                <p class="text-xs">Save<br/><code>02-videos.png</code><br/>to <code>public/screenshots/</code></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="mx-auto max-w-page px-6 py-16">
+    <div class="grid gap-6 md:grid-cols-3">
+      <article class="rounded-card border border-sand bg-cream p-6 text-center">
+        <div class="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-coraltint">
+          <span class="text-5xl font-bold text-coral">✓</span>
+        </div>
+        <h3 class="text-lg font-bold text-cocoa">Approved content only</h3>
+        <p class="mt-2 text-sm text-warmbrown">Parents approve all content creators.</p>
+      </article>
+
+      <article class="rounded-card border border-sand bg-cream p-6 text-center">
+        <div class="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-greentint">
+          <span class="text-5xl font-bold text-coral">✦</span>
+        </div>
+        <h3 class="text-lg font-bold text-cocoa">Make &amp; share lists</h3>
+        <p class="mt-2 text-sm text-warmbrown">Save different lists for different interests, share them with other parents.</p>
+      </article>
+
+      <article class="rounded-card border border-sand bg-cream p-6 text-center">
+        <div class="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-bluetint">
+          <span class="text-5xl font-bold text-coral">✕</span>
+        </div>
+        <h3 class="text-lg font-bold text-cocoa">No suggested content</h3>
+        <p class="mt-2 text-sm text-warmbrown">Algorithms will no longer surface related content. You have 100% control.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Screenshot gallery -->
+  <section id="screenshots" class="mx-auto max-w-page px-6 py-16">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold text-cocoa md:text-4xl">See it in action</h2>
+      <p class="mt-4 text-lg text-warmbrown">A calm, kid-safe streaming app where every channel was chosen by you.</p>
+    </div>
+    <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <figure class="flex flex-col items-center text-center">
+        <div class="relative w-[200px] rounded-[28px] border-[8px] border-cocoa bg-cocoa shadow-lg">
+          <div class="absolute left-1/2 top-0 z-10 h-3.5 w-20 -translate-x-1/2 rounded-b-xl bg-cocoa"></div>
+          <div class="overflow-hidden rounded-[20px] bg-cocoa">
+            <img src="public/screenshots/01-shorts-lions.png" alt="Kid-safe lion shorts" class="block h-auto w-full" onerror="this.outerHTML='<div class=&quot;aspect-[3/6.5] flex flex-col items-center justify-center bg-cocoa text-cream/60 text-center p-3 text-[10px]&quot;>📱<br/>01-shorts-lions.png</div>';" />
+          </div>
+        </div>
+        <figcaption class="mt-5">
+          <p class="text-base font-bold text-cocoa">Kid-safe Shorts</p>
+          <p class="mt-1 text-sm text-warmbrown">Only creators you&rsquo;ve approved</p>
+        </figcaption>
+      </figure>
+
+      <figure class="flex flex-col items-center text-center">
+        <div class="relative w-[200px] rounded-[28px] border-[8px] border-cocoa bg-cocoa shadow-lg">
+          <div class="absolute left-1/2 top-0 z-10 h-3.5 w-20 -translate-x-1/2 rounded-b-xl bg-cocoa"></div>
+          <div class="overflow-hidden rounded-[20px] bg-cocoa">
+            <img src="public/screenshots/05-parents-lists.png" alt="Pixley parent control panel" class="block h-auto w-full" onerror="this.outerHTML='<div class=&quot;aspect-[3/6.5] flex flex-col items-center justify-center bg-cocoa text-cream/60 text-center p-3 text-[10px]&quot;>📱<br/>05-parents-lists.png</div>';" />
+          </div>
+        </div>
+        <figcaption class="mt-5">
+          <p class="text-base font-bold text-cocoa">Parent controls</p>
+          <p class="mt-1 text-sm text-warmbrown">Toggle whole lists on or off</p>
+        </figcaption>
+      </figure>
+
+      <figure class="flex flex-col items-center text-center">
+        <div class="relative w-[200px] rounded-[28px] border-[8px] border-cocoa bg-cocoa shadow-lg">
+          <div class="absolute left-1/2 top-0 z-10 h-3.5 w-20 -translate-x-1/2 rounded-b-xl bg-cocoa"></div>
+          <div class="overflow-hidden rounded-[20px] bg-cocoa">
+            <img src="public/screenshots/03-shorts-travel.png" alt="Travel short in Pixley" class="block h-auto w-full" onerror="this.outerHTML='<div class=&quot;aspect-[3/6.5] flex flex-col items-center justify-center bg-cocoa text-cream/60 text-center p-3 text-[10px]&quot;>📱<br/>03-shorts-travel.png</div>';" />
+          </div>
+        </div>
+        <figcaption class="mt-5">
+          <p class="text-base font-bold text-cocoa">Approved channels</p>
+          <p class="mt-1 text-sm text-warmbrown">Travel, science, hobbies — your call</p>
+        </figcaption>
+      </figure>
+
+      <figure class="flex flex-col items-center text-center">
+        <div class="relative w-[200px] rounded-[28px] border-[8px] border-cocoa bg-cocoa shadow-lg">
+          <div class="absolute left-1/2 top-0 z-10 h-3.5 w-20 -translate-x-1/2 rounded-b-xl bg-cocoa"></div>
+          <div class="overflow-hidden rounded-[20px] bg-cocoa">
+            <img src="public/screenshots/04-parent-tour.png" alt="Pixley parent tour" class="block h-auto w-full" onerror="this.outerHTML='<div class=&quot;aspect-[3/6.5] flex flex-col items-center justify-center bg-cocoa text-cream/60 text-center p-3 text-[10px]&quot;>📱<br/>04-parent-tour.png</div>';" />
+          </div>
+        </div>
+        <figcaption class="mt-5">
+          <p class="text-base font-bold text-cocoa">Quick parent tour</p>
+          <p class="mt-1 text-sm text-warmbrown">Set up in minutes</p>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Tagline -->
+  <section class="mx-auto max-w-page px-6 py-16 text-center">
+    <p class="text-3xl font-bold tracking-wide text-coral md:text-4xl">PIXLEY</p>
+    <p class="mt-4 text-xl text-cocoa md:text-2xl">Where the parent controls the content</p>
+    <div class="mt-8">
+      <a href="#features" class="text-base font-medium text-coral hover:underline">Learn more →</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="mt-24 border-t border-sand bg-cream">
+  <div class="mx-auto max-w-page px-6 py-12">
+    <div class="flex flex-col items-center gap-8 md:flex-row md:items-start md:justify-between">
+      <div class="text-center md:text-left">
+        <p class="text-2xl font-bold tracking-wide text-coral">PIXLEY</p>
+        <p class="mt-2 max-w-xs text-sm text-warmbrown">Where the parent controls the content</p>
+      </div>
+      <nav aria-label="Footer" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm">
+        <span class="text-warmbrown/70">Blog</span>
+        <span class="text-warmbrown/70">About Us</span>
+        <span class="text-warmbrown/70">Support</span>
+        <a href="#contact" class="text-cocoa hover:text-coral transition-colors">Contact</a>
+        <a href="#" class="text-cocoa hover:text-coral transition-colors">Privacy Policy</a>
+        <a href="#" class="text-cocoa hover:text-coral transition-colors">Terms of Service</a>
+      </nav>
+    </div>
+    <div class="mt-10 border-t border-sand pt-6 text-center text-xs text-warmbrown">
+      © 2026 Pixley. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

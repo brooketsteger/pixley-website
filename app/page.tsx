@@ -21,9 +21,8 @@ export default function HomePage() {
                 <span className="text-coral">Shorts &amp; Reels</span>
               </h1>
               <p className="mt-6 max-w-md text-lg text-warmbrown">
-                A kid-safe streaming app where you approve every channel.
-                No algorithm. No suggested content. Just the videos
-                you&rsquo;ve said yes to.
+                A streaming app where you approve every channel.
+                No algorithm. No fear. Just the videos you&rsquo;ve said yes to.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
@@ -43,10 +42,13 @@ export default function HomePage() {
             </div>
 
             <div className="relative flex justify-center md:justify-end">
-              <PhoneFrame
-                src="/screenshots/02-videos.png"
+              <Image
+                src="/screenshots/videos.png"
                 alt="The Pixley Videos library on a phone, showing parent-approved videos from Flying The Nest and Nat Geo Kids"
+                width={620}
+                height={1286}
                 priority
+                className="h-auto w-[260px] drop-shadow-2xl md:w-[320px]"
               />
             </div>
           </div>
@@ -69,10 +71,10 @@ export default function HomePage() {
               icon="✓"
             />
             <FeatureCard
-              title="Make &amp; share lists"
-              body="Save different lists for different interests, share them with other parents."
+              title="Set time limits"
+              body="Set time limits for Videos and Shorts, or turn Shorts off all together."
               tint="bg-greentint"
-              icon="✦"
+              icon="⏱"
             />
             <FeatureCard
               title="No suggested content"
@@ -102,27 +104,27 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <ScreenshotTile
-              src="/screenshots/01-shorts-lions.png"
+              src="/screenshots/shorts.png"
               alt="A National Geographic Kids short about lion moms playing in the Pixley app"
               caption="Kid-safe Shorts"
               note="Only creators you&rsquo;ve approved"
             />
             <ScreenshotTile
-              src="/screenshots/05-parents-lists.png"
+              src="/screenshots/parents-lists.png"
               alt="The Pixley Parents control panel showing My Lists and Pixley Lists with toggles for Science, Travel, Minecraft, and LEGO"
-              caption="Parent controls"
-              note="Toggle whole lists on or off"
+              caption="Curated lists"
+              note="Toggle whole categories on or off"
             />
             <ScreenshotTile
-              src="/screenshots/03-shorts-travel.png"
-              alt="A Luxury Family Travel short about a Geneva chocolate pass in the Pixley app"
-              caption="Approved channels"
-              note="Travel, science, hobbies — your call"
+              src="/screenshots/parent-timer.png"
+              alt="The Pixley parent controls panel for setting a daily Shorts time limit, disabling Shorts, and setting a parent PIN"
+              caption="Daily time limits"
+              note="Set a Shorts cap and a parent PIN"
             />
             <ScreenshotTile
-              src="/screenshots/04-parent-tour.png"
+              src="/screenshots/parent-tour.png"
               alt="The Pixley parent tour onboarding screen welcoming a new parent"
               caption="Quick parent tour"
               note="Set up in minutes"
@@ -132,10 +134,14 @@ export default function HomePage() {
 
         {/* Tagline */}
         <section className="mx-auto max-w-page px-6 py-16 text-center">
-          <p className="text-3xl font-bold tracking-wide text-coral md:text-4xl">
-            PIXLEY
-          </p>
-          <p className="mt-4 text-xl text-cocoa md:text-2xl">
+          <Image
+            src="/logo.png"
+            alt="Pixley"
+            width={400}
+            height={165}
+            className="mx-auto h-16 w-auto md:h-20"
+          />
+          <p className="mt-6 text-xl text-cocoa md:text-2xl">
             Where the parent controls the content
           </p>
           <div className="mt-8">
@@ -183,39 +189,9 @@ function FeatureCard({
 }
 
 /**
- * iPhone-style frame for app screenshots. Pure CSS — no external image
- * needed for the frame itself. The `src` should be a portrait phone
- * screenshot (roughly 3:6.5 aspect or similar).
+ * Screenshot tile — the screenshots already include the iPhone device frame,
+ * so we just display them with a soft drop shadow on the cream background.
  */
-function PhoneFrame({
-  src,
-  alt,
-  priority = false,
-}: {
-  src: string;
-  alt: string;
-  priority?: boolean;
-}) {
-  return (
-    <div className="relative">
-      <div className="relative w-[280px] rounded-[44px] border-[12px] border-cocoa bg-cocoa shadow-xl md:w-[320px]">
-        {/* Notch */}
-        <div className="absolute left-1/2 top-0 z-10 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-cocoa" />
-        <div className="overflow-hidden rounded-[32px] bg-cocoa">
-          <Image
-            src={src}
-            alt={alt}
-            width={400}
-            height={870}
-            priority={priority}
-            className="block h-auto w-full"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ScreenshotTile({
   src,
   alt,
@@ -229,18 +205,13 @@ function ScreenshotTile({
 }) {
   return (
     <figure className="flex flex-col items-center text-center">
-      <div className="relative w-[200px] rounded-[28px] border-[8px] border-cocoa bg-cocoa shadow-lg">
-        <div className="absolute left-1/2 top-0 z-10 h-3.5 w-20 -translate-x-1/2 rounded-b-xl bg-cocoa" />
-        <div className="overflow-hidden rounded-[20px] bg-cocoa">
-          <Image
-            src={src}
-            alt={alt}
-            width={400}
-            height={870}
-            className="block h-auto w-full"
-          />
-        </div>
-      </div>
+      <Image
+        src={src}
+        alt={alt}
+        width={620}
+        height={1286}
+        className="h-auto w-[200px] drop-shadow-xl"
+      />
       <figcaption className="mt-5">
         <p className="text-base font-bold text-cocoa">{caption}</p>
         <p

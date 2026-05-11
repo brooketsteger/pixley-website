@@ -6,8 +6,14 @@ export default function Footer() {
       <div className="mx-auto max-w-page px-6 py-12">
         <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:justify-between">
           <div className="text-center md:text-left">
-            <p className="text-2xl font-bold tracking-wide text-coral">PIXLEY</p>
-            <p className="mt-2 max-w-xs text-sm text-warmbrown">
+            <img
+              src="/logo.png"
+              alt="Pixley"
+              width={400}
+              height={165}
+              className="mx-auto h-10 w-auto md:mx-0"
+            />
+            <p className="mt-3 max-w-xs text-sm text-warmbrown">
               Where the parent controls the content
             </p>
           </div>

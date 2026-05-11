@@ -9,10 +9,10 @@ export default function Header() {
           <Image
             src="/logo.png"
             alt="Pixley"
-            width={120}
-            height={32}
+            width={400}
+            height={165}
             priority
-            className="h-8 w-auto"
+            className="h-10 w-auto md:h-12"
           />
         </Link>
         <nav className="flex items-center gap-3">

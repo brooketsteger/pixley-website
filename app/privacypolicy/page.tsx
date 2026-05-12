@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalLayout title="Privacy Policy" effectiveDate="March 1, 2026">
+    <LegalLayout title="Privacy Policy" effectiveDate="May 11, 2026">
       <p>
         Pixley (&ldquo;Pixley,&rdquo; &ldquo;we,&rdquo; &ldquo;our,&rdquo; or
         &ldquo;us&rdquo;) respects your privacy and is committed to protecting
@@ -194,7 +194,7 @@ export default function PrivacyPolicyPage() {
         <p>However, no online service can guarantee absolute security.</p>
       </Section>
 
-      <Section title="6. Data retention">
+      <Section title="6. Data retention and account deletion">
         <p>We retain personal information only as long as necessary to:</p>
         <List
           items={[
@@ -203,9 +203,24 @@ export default function PrivacyPolicyPage() {
             "Comply with legal obligations",
           ]}
         />
+        <h3 className="text-lg font-bold">Deleting your account</h3>
         <p>
-          Users may request deletion of their account and associated data at
-          any time.
+          You can delete your Pixley account at any time from inside the app:
+          go to the <strong>Parents</strong> tab and select{" "}
+          <strong>Delete Account</strong>. No email request or support contact
+          is required.
+        </p>
+        <p>
+          When you request deletion, your account enters a 7-day recovery
+          period during which your information is held but inaccessible. If you
+          sign back in within 7 days, your account is restored. After 7 days,
+          your account and all associated personal data are{" "}
+          <strong>permanently purged</strong> and cannot be restored.
+        </p>
+        <p>
+          We may retain limited information after the 7-day window only where
+          required by law (for example, anti-fraud or financial recordkeeping
+          obligations).
         </p>
       </Section>
 

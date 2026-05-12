@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <LegalLayout title="Terms of Service" effectiveDate="March 1, 2026">
+    <LegalLayout title="Terms of Service" effectiveDate="May 11, 2026">
       <p>
         Welcome to Pixley. These Terms of Service (&ldquo;Terms&rdquo;) govern
         your access to and use of the Pixley website, applications, and
@@ -182,7 +182,7 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="9. Termination">
+      <Section title="9. Termination and account deletion">
         <p>We may suspend or terminate access to the Service if:</p>
         <List
           items={[
@@ -191,11 +191,25 @@ export default function TermsOfServicePage() {
             "The Service is discontinued",
           ]}
         />
+        <h3 className="text-lg font-bold">Deleting your account</h3>
         <p>
-          You may terminate your account at any time by contacting:{" "}
+          You may delete your Pixley account at any time from inside the app.
+          Open the <strong>Parents</strong> tab and select{" "}
+          <strong>Delete Account</strong>.
+        </p>
+        <p>
+          After you request deletion, your account enters a 7-day recovery
+          period. If you sign back in within those 7 days, your account is
+          restored. After 7 days, your account and all associated personal data
+          are <strong>permanently purged</strong> and cannot be restored.
+        </p>
+        <p>
+          If you have any questions or need help with account deletion, you can
+          also contact us at{" "}
           <a className="text-coral hover:underline" href="mailto:support@usepixley.com">
             support@usepixley.com
           </a>
+          .
         </p>
       </Section>
 

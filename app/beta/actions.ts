@@ -26,15 +26,16 @@ export async function joinWaitlist(formData: FormData): Promise<WaitlistResult> 
 
   const supabase = getSupabaseServer();
 
-  // If Supabase env vars aren't configured yet, gracefully accept the signup
-  // and log to the server console. Replace once env vars are set in Vercel.
+  // If Supabase env vars aren't configured, fail loudly rather than showing
+  // the user a fake success. A silent fallback makes broken deploys look fine.
   if (!supabase) {
-    console.warn(
-      `[waitlist] Supabase not configured — would have stored: ${email}`
+    console.error(
+      `[waitlist] Supabase not configured — signup NOT stored: ${email}. ` +
+        `Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in the runtime environment.`
     );
     return {
-      ok: true,
-      message: "Thanks! You're on the list. We'll be in touch when the beta opens.",
+      ok: false,
+      message: "Something went wrong. Please try again in a moment.",
     };
   }
 

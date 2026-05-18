@@ -77,8 +77,8 @@ export default function BetaPage() {
             <ValueProp
               tint="bg-bluetint"
               icon="✕"
-              title="No suggested content"
-              body="Algorithms will no longer surface related content. You have 100% control."
+              title="Disable YouTube Shorts"
+              body="Switch YouTube Shorts off entirely. Leave only the long-form videos you&rsquo;ve approved."
             />
           </div>
         </section>
@@ -111,7 +111,7 @@ export default function BetaPage() {
               src="/screenshots/parents-lists.png"
               alt="The Pixley Parents control panel with curated channel lists"
               caption="Curated lists"
-              note="Toggle whole categories on or off"
+              note="Use Pixley&rsquo;s Lists, create your own, toggle categories on and off."
             />
             <ShotTile
               src="/screenshots/parent-timer.png"

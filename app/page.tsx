@@ -77,8 +77,8 @@ export default function HomePage() {
               icon="⏱"
             />
             <FeatureCard
-              title="No suggested content"
-              body="Algorithms will no longer surface related content. You have 100% control."
+              title="Disable YouTube Shorts"
+              body="Switch YouTube Shorts off entirely. Leave only the long-form videos you&rsquo;ve approved."
               tint="bg-bluetint"
               icon="✕"
             />
@@ -115,7 +115,7 @@ export default function HomePage() {
               src="/screenshots/parents-lists.png"
               alt="The Pixley Parents control panel showing My Lists and Pixley Lists with toggles for Science, Travel, Minecraft, and LEGO"
               caption="Curated lists"
-              note="Toggle whole categories on or off"
+              note="Use Pixley&rsquo;s Lists, create your own, toggle categories on and off."
             />
             <ScreenshotTile
               src="/screenshots/parent-timer.png"

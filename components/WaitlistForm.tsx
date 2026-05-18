@@ -35,6 +35,23 @@ export default function WaitlistForm({
       ? "h-14 px-7 text-lg"
       : "h-12 px-6 text-base";
 
+  // Success state: hide the form entirely and show a prominent confirmation.
+  if (result?.ok) {
+    return (
+      <div id={id} className="w-full">
+        <div
+          role="status"
+          aria-live="polite"
+          className="rounded-card border-2 border-teal bg-teal/10 px-6 py-5 text-center"
+        >
+          <p className="text-xl font-bold text-teal md:text-2xl">
+            {result.message}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div id={id} className="w-full">
       <form
@@ -67,11 +84,11 @@ export default function WaitlistForm({
         </button>
       </form>
 
-      {result && (
+      {result && !result.ok && (
         <p
           role="status"
           aria-live="polite"
-          className={`mt-3 text-sm ${result.ok ? "text-teal" : "text-coral"}`}
+          className="mt-3 text-base font-medium text-coral"
         >
           {result.message}
         </p>

@@ -24,8 +24,13 @@ export default function Footer() {
             aria-label="Footer"
             className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
           >
-            {/* Inactive placeholder items — kept for layout parity with Figma Sites */}
-            <span className="text-warmbrown/70">Blog</span>
+            <Link
+              href="/blog"
+              className="text-cocoa hover:text-coral transition-colors"
+            >
+              Blog
+            </Link>
+            {/* Inactive placeholder item — kept for layout parity with Figma Sites */}
             <span className="text-warmbrown/70">About Us</span>
             <Link
               href="/contact"

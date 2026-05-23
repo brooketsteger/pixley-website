@@ -23,3 +23,74 @@ h1, h2, h3, h4, h5, h6 {
 p {
   line-height: 1.5;
 }
+
+/* Long-form content (blog posts from Substack/samples, legal pages).
+   Styles raw HTML that arrives without utility classes. */
+.prose-pixley {
+  font-size: 1.0625rem;
+}
+.prose-pixley p {
+  margin: 1.1rem 0;
+  line-height: 1.7;
+}
+.prose-pixley h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2.25rem 0 0.75rem;
+  color: #2b1d12;
+}
+.prose-pixley h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 1.75rem 0 0.5rem;
+  color: #2b1d12;
+}
+.prose-pixley a {
+  color: #f25f5c;
+  text-decoration: underline;
+}
+.prose-pixley a:hover {
+  opacity: 0.85;
+}
+.prose-pixley ul {
+  list-style: disc;
+  margin: 1.1rem 0;
+  padding-left: 1.5rem;
+}
+.prose-pixley ol {
+  list-style: decimal;
+  margin: 1.1rem 0;
+  padding-left: 1.5rem;
+}
+.prose-pixley li {
+  margin: 0.35rem 0;
+  line-height: 1.6;
+}
+.prose-pixley strong {
+  font-weight: 700;
+}
+.prose-pixley em {
+  font-style: italic;
+}
+.prose-pixley img {
+  border-radius: 16px;
+  margin: 1.75rem 0;
+  max-width: 100%;
+  height: auto;
+}
+.prose-pixley blockquote {
+  border-left: 4px solid #f6e4c6;
+  padding-left: 1rem;
+  margin: 1.75rem 0;
+  color: #7a5f4b;
+  font-style: italic;
+}
+.prose-pixley hr {
+  border: 0;
+  border-top: 1px solid #f6e4c6;
+  margin: 2.5rem 0;
+}
+.prose-pixley .note {
+  font-size: 0.9rem;
+  color: #7a5f4b;
+}

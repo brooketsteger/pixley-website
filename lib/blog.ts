@@ -1,5 +1,4 @@
 import Parser from "rss-parser";
-import { samplePosts } from "./sample-posts";
 
 /**
  * Blog data layer.
@@ -8,16 +7,17 @@ import { samplePosts } from "./sample-posts";
  * RSS feed. When you publish (or update) a post in Substack, it appears here
  * on the next page rebuild (we revalidate hourly — see REVALIDATE_SECONDS).
  *
- * Until the Substack feed is configured (or while it's empty), we render the
- * on-brand sample posts in `lib/sample-posts.ts` so the blog still looks
- * complete. As soon as the feed returns at least one real post, the samples
- * are dropped automatically.
- *
- * To connect Substack: set NEXT_PUBLIC_SUBSTACK_URL in your environment to
- * your publication's base URL, e.g. https://pixley.substack.com
- * (no trailing slash, no /feed). On Vercel: Project → Settings → Environment
- * Variables.
+ * The publication is hardcoded below (DEFAULT_SUBSTACK_BASE) so the blog works
+ * without any environment setup. To point at a different publication (e.g. a
+ * custom domain), set NEXT_PUBLIC_SUBSTACK_URL to its base URL — no trailing
+ * slash, no /feed — and it overrides the default. On Vercel:
+ * Project → Settings → Environment Variables.
  */
+
+// Pixley's Substack publication. If your publication actually lives at a
+// different address (custom domain, or a subdomain other than this), update
+// this value or set NEXT_PUBLIC_SUBSTACK_URL.
+const DEFAULT_SUBSTACK_BASE = "https://usepixley.substack.com";
 
 export type BlogPost = {
   slug: string;
@@ -27,17 +27,16 @@ export type BlogPost = {
   date: string; // ISO 8601
   author: string;
   coverImage?: string;
-  /** Original Substack URL, if this post came from Substack. */
+  /** Original Substack URL. */
   canonicalUrl?: string;
-  source: "substack" | "sample";
+  source: "substack";
 };
 
 export const REVALIDATE_SECONDS = 3600; // re-fetch the Substack feed hourly
 
-const SUBSTACK_BASE = (process.env.NEXT_PUBLIC_SUBSTACK_URL || "").replace(
-  /\/+$/,
-  ""
-);
+const SUBSTACK_BASE = (
+  process.env.NEXT_PUBLIC_SUBSTACK_URL || DEFAULT_SUBSTACK_BASE
+).replace(/\/+$/, "");
 
 // Only `content:encoded` needs a custom mapping; rss-parser provides the rest
 // (title, link, pubDate, isoDate, creator, content, contentSnippet, enclosure)
@@ -108,15 +107,14 @@ async function fetchSubstackPosts(): Promise<BlogPost[]> {
 
     return posts;
   } catch {
-    // Network/parse error — fall back to samples.
+    // Network/parse error — render an empty blog rather than crashing.
     return [];
   }
 }
 
-/** All posts, newest first. Prefers Substack; falls back to samples. */
+/** All posts from the Substack feed, newest first. */
 export async function getAllPosts(): Promise<BlogPost[]> {
-  const substack = await fetchSubstackPosts();
-  const posts = substack.length > 0 ? substack : samplePosts;
+  const posts = await fetchSubstackPosts();
   return [...posts].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );

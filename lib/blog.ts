@@ -74,6 +74,90 @@ function firstImageFromHtml(html: string): string | undefined {
   return match?.[1];
 }
 
+/**
+ * Remove a `<div>` (and all its nested children) whose class contains the
+ * given prefix. Used to strip Substack's injected widget wrappers — these
+ * can't be matched with a plain regex because they nest other `<div>`s.
+ */
+function stripNestedDivByClass(html: string, classPrefix: string): string {
+  const openRe = new RegExp(
+    `<div[^>]*class=["'][^"']*${classPrefix}[^"']*["'][^>]*>`,
+    "i"
+  );
+  let result = html;
+  // Cap iterations defensively — a malformed feed shouldn't loop forever.
+  for (let iter = 0; iter < 50; iter++) {
+    const openMatch = openRe.exec(result);
+    if (!openMatch) break;
+    const start = openMatch.index;
+    let i = start + openMatch[0].length;
+    let depth = 1;
+    while (i < result.length && depth > 0) {
+      const nextOpen = result.indexOf("<div", i);
+      const nextClose = result.indexOf("</div>", i);
+      if (nextClose === -1) break;
+      if (nextOpen !== -1 && nextOpen < nextClose) {
+        depth++;
+        i = nextOpen + 4;
+      } else {
+        depth--;
+        i = nextClose + 6;
+      }
+    }
+    if (depth === 0) {
+      result = result.slice(0, start) + result.slice(i);
+    } else {
+      // Couldn't find a matching close — stop rather than risk corrupting HTML.
+      break;
+    }
+  }
+  return result;
+}
+
+/**
+ * Strip Substack's injected subscribe widgets, share buttons, and
+ * "Thanks for reading..." footers from post HTML so the website's blog
+ * pages render only the author's content. Substack emits these via RSS as
+ * recognizable wrapper classes — we remove the wrappers and any trailing
+ * empty paragraphs left behind.
+ *
+ * Conservative on purpose: we only remove patterns we're confident are
+ * Substack chrome (specific class names, the exact "Thanks for reading"
+ * sentence), so author-written links and images survive.
+ */
+function stripSubstackChrome(html: string): string {
+  if (!html) return html;
+  let out = html;
+
+  // Subscribe widget wrappers (the embedded email-signup boxes).
+  out = stripNestedDivByClass(out, "subscription-widget-wrap");
+  out = stripNestedDivByClass(out, "subscription-widget");
+  // "Share Pixley" / pledge / comment CTA wrappers.
+  out = stripNestedDivByClass(out, "button-wrapper");
+  out = stripNestedDivByClass(out, "subscribe-widget");
+  out = stripNestedDivByClass(out, "pledge-button-wrap");
+  out = stripNestedDivByClass(out, "comments-link");
+
+  // The standard "Thanks for reading [Publication]! Subscribe for free..."
+  // paragraph Substack appends to every post.
+  out = out.replace(
+    /<p[^>]*>\s*(?:<strong>)?\s*Thanks for reading\b[\s\S]*?<\/p>/gi,
+    ""
+  );
+  // Standalone "Subscribe now" / "Share" anchor buttons left behind, in case
+  // the surrounding wrapper had an unfamiliar class.
+  out = out.replace(
+    /<p[^>]*>\s*<a[^>]*class=["'][^"']*\bbutton\b[^"']*["'][^>]*>[\s\S]*?<\/a>\s*<\/p>/gi,
+    ""
+  );
+
+  // Clean up any empty paragraphs / whitespace runs we may have created.
+  out = out.replace(/<p[^>]*>\s*<\/p>/gi, "");
+  out = out.replace(/(\s*\n){3,}/g, "\n\n");
+
+  return out.trim();
+}
+
 async function fetchSubstackPosts(): Promise<BlogPost[]> {
   if (!SUBSTACK_BASE) return [];
 
@@ -90,7 +174,8 @@ async function fetchSubstackPosts(): Promise<BlogPost[]> {
     const posts: BlogPost[] = (feed.items || [])
       .filter((item) => item.link && item.title)
       .map((item) => {
-        const html = item.contentEncoded || item.content || "";
+        const rawHtml = item.contentEncoded || item.content || "";
+        const html = stripSubstackChrome(rawHtml);
         const link = item.link as string;
         return {
           slug: slugFromLink(link),
@@ -99,7 +184,12 @@ async function fetchSubstackPosts(): Promise<BlogPost[]> {
           contentHtml: html,
           date: item.isoDate || item.pubDate || new Date().toISOString(),
           author: item.creator || "Pixley",
-          coverImage: item.enclosure?.url || firstImageFromHtml(html),
+          // Only treat an image as a "cover" if the author actually placed
+          // one in the post body. We intentionally ignore the RSS enclosure,
+          // because Substack uses the publication avatar (our app icon) as
+          // the enclosure when no real hero image is set, and we don't want
+          // that rendered as a giant square at the top of every post.
+          coverImage: firstImageFromHtml(html),
           canonicalUrl: link,
           source: "substack" as const,
         };

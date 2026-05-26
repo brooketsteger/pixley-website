@@ -104,7 +104,7 @@ export default async function BlogPostPage({ params }: Params) {
             <img
               src={post.coverImage}
               alt=""
-              className="mt-8 w-full rounded-card object-cover"
+              className="mt-8 max-h-[28rem] w-full rounded-card object-cover"
             />
           )}
 

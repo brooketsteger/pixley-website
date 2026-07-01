@@ -3,6 +3,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WaitlistForm from "@/components/WaitlistForm";
+import { WaitlistProvider } from "@/components/WaitlistContext";
 
 export const metadata: Metadata = {
   title: "Join the Pixley beta",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function BetaPage() {
   return (
-    <>
+    <WaitlistProvider>
       <Header />
 
       <main>
@@ -146,7 +147,7 @@ export default function BetaPage() {
       </main>
 
       <Footer />
-    </>
+    </WaitlistProvider>
   );
 }
 

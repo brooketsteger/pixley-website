@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { joinWaitlist, type WaitlistResult } from "@/app/beta/actions";
+import { useWaitlist } from "@/components/WaitlistContext";
 
 type Size = "default" | "large";
 
@@ -15,14 +16,25 @@ export default function WaitlistForm({
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<WaitlistResult | null>(null);
   const [email, setEmail] = useState("");
+  const waitlist = useWaitlist();
+
+  // Success is shared across all forms on the page (via WaitlistProvider) so
+  // that submitting one form flips every form into the thank-you state. Errors
+  // stay local to the form that was submitted.
+  const success = waitlist?.success ?? (result?.ok ? result : null);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
       const res = await joinWaitlist(fd);
-      setResult(res);
-      if (res.ok) setEmail("");
+      if (res.ok) {
+        setEmail("");
+        if (waitlist) waitlist.setSuccess(res);
+        else setResult(res);
+      } else {
+        setResult(res);
+      }
     });
   }
 
@@ -36,7 +48,7 @@ export default function WaitlistForm({
       : "h-12 px-6 text-base";
 
   // Success state: hide the form entirely and show a prominent confirmation.
-  if (result?.ok) {
+  if (success) {
     return (
       <div id={id} className="w-full">
         <div
@@ -45,7 +57,7 @@ export default function WaitlistForm({
           className="rounded-card border-2 border-teal bg-teal/10 px-6 py-5 text-center"
         >
           <p className="text-xl font-bold text-teal md:text-2xl">
-            {result.message}
+            {success.message}
           </p>
         </div>
       </div>
@@ -96,7 +108,7 @@ export default function WaitlistForm({
 
       {!result && (
         <p className="mt-3 text-xs text-warmbrown">
-          We&rsquo;ll only email you when the beta opens. No spam, ever.
+          We&rsquo;ll email you when the beta opens. We won&rsquo;t ever sell or share your email address.
         </p>
       )}
     </div>

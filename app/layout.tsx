@@ -135,7 +135,8 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans bg-cream text-cocoa antialiased">
-        {/* Google tag (gtag.js) — loads on every page via root layout */}
+        {/* Google tag (gtag.js) — loads on every page via root layout.
+            Loads once, then configures both Google Ads (AW-) and GA4 (G-). */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-18168714092"
           strategy="afterInteractive"
@@ -146,6 +147,7 @@ export default function RootLayout({
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'AW-18168714092');
+            gtag('config', 'G-D1WSEMMHGF');
           `}
         </Script>
         {children}

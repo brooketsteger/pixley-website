@@ -86,7 +86,7 @@ export default function WaitlistForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={pending}
-          className={`flex-1 rounded-full border-2 border-sand bg-white text-cocoa placeholder:text-warmbrown/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 transition-all ${inputClasses}`}
+          className={`w-full sm:flex-1 rounded-full border-2 border-sand bg-white text-cocoa placeholder:text-warmbrown/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 transition-all ${inputClasses}`}
         />
         <button
           type="submit"

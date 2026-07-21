@@ -38,10 +38,11 @@ export default function WaitlistForm({
     });
   }
 
+  // Taller on mobile for an easier tap target; reset to the design height at sm+.
   const inputClasses =
     size === "large"
-      ? "h-14 text-lg px-5"
-      : "h-12 text-base px-4";
+      ? "h-16 sm:h-14 text-lg px-5"
+      : "h-14 sm:h-12 text-base px-4";
   const buttonClasses =
     size === "large"
       ? "h-14 px-7 text-lg"

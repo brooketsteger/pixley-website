@@ -48,10 +48,13 @@ export default function BetaPage() {
           </div>
         </section>
 
+        {/* On mobile, show the screenshots before the value props; keep the
+            original order (value props first) at md and up (web). */}
+        <div className="flex flex-col">
         {/* Value props */}
         <section
           aria-labelledby="why-heading"
-          className="mx-auto max-w-page px-6 py-16"
+          className="order-2 mx-auto max-w-page px-6 py-16 md:order-1"
         >
           <div className="mx-auto max-w-2xl text-center">
             <h2
@@ -87,7 +90,7 @@ export default function BetaPage() {
         {/* Screenshot showcase */}
         <section
           aria-labelledby="see-it-heading"
-          className="mx-auto max-w-page px-6 py-16"
+          className="order-1 mx-auto max-w-page px-6 py-16 md:order-2"
         >
           <div className="mx-auto max-w-2xl text-center">
             <h2
@@ -128,6 +131,7 @@ export default function BetaPage() {
             />
           </div>
         </section>
+        </div>
 
         {/* Final CTA */}
         <section className="mx-auto max-w-page px-6 py-20">

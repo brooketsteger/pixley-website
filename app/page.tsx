@@ -25,13 +25,12 @@ export default function HomePage() {
                 No algorithm. No fear. Just the videos you&rsquo;ve said yes to.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  id="download"
-                  href="#download"
+                <Link
+                  href="/beta"
                   className="rounded-full bg-coral px-6 py-3 text-base font-bold text-cream hover:opacity-90 transition-opacity"
                 >
                   Download Now
-                </a>
+                </Link>
                 <a
                   href="#features"
                   className="rounded-full border-2 border-coral px-6 py-3 text-base font-bold text-coral hover:bg-coraltint transition-colors"

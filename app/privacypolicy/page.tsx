@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalLayout title="Privacy Policy" effectiveDate="May 11, 2026">
+    <LegalLayout title="Privacy Policy" effectiveDate="October 5, 2026">
       <p>
         Pixley (&ldquo;Pixley,&rdquo; &ldquo;we,&rdquo; &ldquo;our,&rdquo; or
         &ldquo;us&rdquo;) respects your privacy and is committed to protecting
@@ -100,6 +100,26 @@ export default function PrivacyPolicyPage() {
           We do not sell Google user data and do not use Google user data for
           advertising purposes.
         </p>
+
+        <h3 className="text-lg font-bold">Subscription and purchase information</h3>
+        <p>
+          Pixley subscriptions are purchased through Apple and managed with
+          RevenueCat, our subscription service provider. When you start a free
+          trial or subscribe, RevenueCat receives:
+        </p>
+        <List
+          items={[
+            "Your Pixley account ID",
+            "Your email address",
+            "Your purchase history (plan, free trial, and renewal status)",
+          ]}
+        />
+        <p>
+          We use this information only to unlock your subscription and keep it
+          working across your devices. Apple processes all payments; Pixley
+          does not receive or store your payment card details. This
+          information is not used for advertising.
+        </p>
       </Section>
 
       <Section title="2. How we use information">
@@ -110,6 +130,7 @@ export default function PrivacyPolicyPage() {
             "Allow parents to manage and control content channels",
             "Personalize user experience",
             "Authenticate users and maintain account security",
+            "Process and manage subscriptions",
             "Improve product functionality and performance",
             "Provide customer support",
             "Comply with legal obligations",
@@ -159,6 +180,7 @@ export default function PrivacyPolicyPage() {
           items={[
             "Cloud hosting providers",
             "Authentication services",
+            "Subscription management providers (RevenueCat)",
             "Analytics providers",
             "Customer support tools",
           ]}
@@ -222,6 +244,11 @@ export default function PrivacyPolicyPage() {
           required by law (for example, anti-fraud or financial recordkeeping
           obligations).
         </p>
+        <p>
+          Deleting your Pixley account does not cancel a subscription
+          purchased through Apple. To stop being billed, cancel the
+          subscription in your Apple account settings.
+        </p>
       </Section>
 
       <Section title="7. Your privacy rights">
@@ -242,14 +269,22 @@ export default function PrivacyPolicyPage() {
 
       <Section title="8. Third-party services">
         <p>
-          Pixley may integrate with third-party services such as YouTube or
-          Google authentication.
+          Pixley may integrate with third-party services such as YouTube,
+          Google authentication, Sign in with Apple, Apple in-app purchases,
+          and RevenueCat.
         </p>
         <p>
           These services are governed by their own privacy policies. We
           encourage you to review:
         </p>
-        <List items={["Google Privacy Policy", "YouTube Terms of Service"]} />
+        <List
+          items={[
+            "Google Privacy Policy",
+            "YouTube Terms of Service",
+            "Apple Privacy Policy",
+            "RevenueCat Privacy Policy",
+          ]}
+        />
         <p>
           Pixley only accesses data necessary to provide the functionality
           requested by the user.

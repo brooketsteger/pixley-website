@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <LegalLayout title="Terms of Service" effectiveDate="May 11, 2026">
+    <LegalLayout title="Terms of Service" effectiveDate="October 22, 2026">
       <p>
         Welcome to Pixley. These Terms of Service (&ldquo;Terms&rdquo;) govern
         your access to and use of the Pixley website, applications, and
@@ -148,7 +148,24 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="7. Children&rsquo;s use of the Service">
+      <Section title="7. Objectionable content and reporting">
+        <p>
+          Pixley has zero tolerance for objectionable content and abusive
+          users.
+        </p>
+        <p>
+          Parents can report any channel using the flag icon on every video.
+          Reported channels are immediately removed from that family&rsquo;s
+          feed and sent to Pixley for review.
+        </p>
+        <p>
+          We review reports within 24 hours and remove content that violates
+          these Terms. Accounts that abuse the Service will be suspended or
+          terminated.
+        </p>
+      </Section>
+
+      <Section title="8. Children&rsquo;s use of the Service">
         <p>
           Pixley is designed for children but must be used under the
           supervision of a parent or guardian.
@@ -167,7 +184,7 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="8. Intellectual property">
+      <Section title="9. Intellectual property">
         <p>
           All Pixley software, branding, and platform functionality are the
           property of Pixley or its licensors and are protected by applicable
@@ -182,7 +199,7 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="9. Termination and account deletion">
+      <Section title="10. Termination and account deletion">
         <p>We may suspend or terminate access to the Service if:</p>
         <List
           items={[
@@ -213,7 +230,7 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="10. Disclaimer of warranties">
+      <Section title="11. Disclaimer of warranties">
         <p>
           The Pixley Service is provided &ldquo;as is&rdquo; and &ldquo;as
           available.&rdquo;
@@ -232,7 +249,7 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="11. Limitation of liability">
+      <Section title="12. Limitation of liability">
         <p>
           To the maximum extent permitted by law, Pixley will not be liable
           for:
@@ -248,7 +265,7 @@ export default function TermsOfServicePage() {
         <p>Your use of the Service is at your own risk.</p>
       </Section>
 
-      <Section title="12. Changes to the Service">
+      <Section title="13. Changes to the Service">
         <p>
           Pixley may modify, update, or discontinue parts of the Service at
           any time without prior notice.
@@ -259,14 +276,14 @@ export default function TermsOfServicePage() {
         </p>
       </Section>
 
-      <Section title="13. Governing law">
+      <Section title="14. Governing law">
         <p>
           These Terms will be governed by the laws of the jurisdiction in
           which Pixley operates, without regard to conflict-of-law principles.
         </p>
       </Section>
 
-      <Section title="14. Contact information">
+      <Section title="15. Contact information">
         <p>If you have questions about these Terms, please contact us at:</p>
         <p>
           <strong>Pixley</strong>

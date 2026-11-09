@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import AppStoreButton from "@/components/AppStoreButton";
 
 export default function Header() {
   return (
@@ -28,12 +29,7 @@ export default function Header() {
           >
             Contact
           </Link>
-          <Link
-            href="/beta"
-            className="rounded-full bg-coral px-4 py-2 text-sm font-bold text-cream hover:opacity-90 transition-opacity sm:px-5"
-          >
-            Download
-          </Link>
+          <AppStoreButton label="Download" variant="small" />
         </nav>
       </div>
     </header>

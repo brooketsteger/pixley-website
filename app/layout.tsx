@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { APP_STORE_ID, APP_STORE_URL } from "@/lib/appstore";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -75,6 +76,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://usepixley.com",
   },
+  // Smart App Banner: Safari on iPhone/iPad shows an "Open" / "Get" bar for Pixley.
+  itunes: {
+    appId: APP_STORE_ID,
+  },
 };
 
 export default function RootLayout({
@@ -103,9 +108,12 @@ export default function RootLayout({
   const softwareJsonLd = {
     "@context": "https://schema.org",
     "@type": "MobileApplication",
-    name: "Pixley",
-    operatingSystem: "iOS",
-    applicationCategory: "FamilyApplication",
+    name: "Pixley - Parent Controls",
+    alternateName: "Pixley",
+    operatingSystem: "iOS, iPadOS",
+    applicationCategory: "EducationalApplication",
+    downloadUrl: APP_STORE_URL,
+    installUrl: APP_STORE_URL,
     description:
       "Parental controls for short-form video. Parents approve every creator. No algorithm, no suggested content.",
     offers: {

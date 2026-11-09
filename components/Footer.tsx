@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_STORE_URL } from "@/lib/appstore";
 
 export default function Footer() {
   return (
@@ -24,6 +25,14 @@ export default function Footer() {
             aria-label="Footer"
             className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm"
           >
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener"
+              className="font-medium text-coral hover:underline"
+            >
+              Download on the App Store
+            </a>
             <Link
               href="/blog"
               className="text-cocoa hover:text-coral transition-colors"

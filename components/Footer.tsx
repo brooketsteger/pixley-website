@@ -48,6 +48,12 @@ export default function Footer() {
               Contact
             </Link>
             <Link
+              href="/feedback"
+              className="text-cocoa hover:text-coral transition-colors"
+            >
+              Feedback
+            </Link>
+            <Link
               href="/privacypolicy"
               className="text-cocoa hover:text-coral transition-colors"
             >

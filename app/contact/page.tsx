@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -32,6 +33,14 @@ export default function ContactPage() {
             blurb="Questions about how we handle your or your child&rsquo;s data."
           />
         </div>
+
+        <p className="mt-10 text-base text-warmbrown">
+          Found a bug or have a feature idea?{" "}
+          <Link href="/feedback" className="font-bold text-coral hover:underline">
+            Share it on our feedback page
+          </Link>
+          .
+        </p>
       </main>
       <Footer />
     </>

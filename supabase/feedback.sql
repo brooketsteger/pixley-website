@@ -120,8 +120,9 @@ begin
     insert into feature_votes (feature_id, voter_id) values (p_feature_id, p_voter_id);
   end if;
 
+  -- Add/subtract one (rather than recounting) so a starting count you set by hand is kept.
   update feature_requests fr
-     set vote_count = (select count(*) from feature_votes fv where fv.feature_id = p_feature_id)
+     set vote_count = greatest(fr.vote_count + case when v_deleted = 0 then 1 else -1 end, 0)
    where fr.id = p_feature_id;
 
   return query

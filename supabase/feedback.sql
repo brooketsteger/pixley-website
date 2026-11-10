@@ -28,6 +28,12 @@ create table if not exists public.bug_reports (
 
 alter table public.bug_reports enable row level security;
 
+-- Explicit grants (newer Supabase projects don't auto-expose new tables to the API).
+grant usage on schema public to anon, authenticated;
+revoke all on public.bug_reports from anon, authenticated;
+grant insert (email, description, device, app_version, user_agent)
+  on public.bug_reports to anon, authenticated;
+
 drop policy if exists "public can submit bug reports" on public.bug_reports;
 create policy "public can submit bug reports"
   on public.bug_reports for insert

@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AppStoreButton from "@/components/AppStoreButton";
 
 export default function HomePage() {
   return (
@@ -25,12 +25,7 @@ export default function HomePage() {
                 No algorithm. No fear. Just the videos you&rsquo;ve said yes to.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/beta"
-                  className="rounded-full bg-coral px-6 py-3 text-base font-bold text-cream hover:opacity-90 transition-opacity"
-                >
-                  Download Now
-                </Link>
+                <AppStoreButton />
                 <a
                   href="#features"
                   className="rounded-full border-2 border-coral px-6 py-3 text-base font-bold text-coral hover:bg-coraltint transition-colors"
@@ -144,13 +139,11 @@ export default function HomePage() {
             Where the parent controls the content
           </p>
           <div className="mt-8">
-            <Link
-              href="#features"
-              className="text-base font-medium text-coral hover:underline"
-            >
-              Learn more →
-            </Link>
+            <AppStoreButton />
           </div>
+          <p className="mt-3 text-sm text-warmbrown">
+            Free 7-day trial. For iPhone and iPad.
+          </p>
         </section>
       </main>
 

@@ -1,0 +1,936 @@
+From 3cef128d17befde170028f6d96c0b060eb64e8b2 Mon Sep 17 00:00:00 2001
+From: Brooke Steger <51762633+brooketsteger@users.noreply.github.com>
+Date: Tue, 10 Nov 2026 11:13:03 -0800
+Subject: [PATCH] Add /feedback page: bug report form + public ranked feature
+ requests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Yav3RTufPZ6RXfmZ3XJbzf
+---
+ app/contact/page.tsx           |   9 ++
+ app/feedback/actions.ts        | 150 ++++++++++++++++++
+ app/feedback/page.tsx          |  62 ++++++++
+ app/sitemap.ts                 |   6 +
+ components/BugReportForm.tsx   | 136 +++++++++++++++++
+ components/FeatureRequests.tsx | 269 +++++++++++++++++++++++++++++++++
+ components/Footer.tsx          |   6 +
+ lib/feedback.ts                |  56 +++++++
+ supabase/feedback.sql          | 139 +++++++++++++++++
+ 9 files changed, 833 insertions(+)
+ create mode 100644 app/feedback/actions.ts
+ create mode 100644 app/feedback/page.tsx
+ create mode 100644 components/BugReportForm.tsx
+ create mode 100644 components/FeatureRequests.tsx
+ create mode 100644 lib/feedback.ts
+ create mode 100644 supabase/feedback.sql
+
+diff --git a/app/contact/page.tsx b/app/contact/page.tsx
+index 38de061..210bac4 100644
+--- a/app/contact/page.tsx
++++ b/app/contact/page.tsx
+@@ -1,4 +1,5 @@
+ import type { Metadata } from "next";
++import Link from "next/link";
+ import Header from "@/components/Header";
+ import Footer from "@/components/Footer";
+ 
+@@ -32,6 +33,14 @@ export default function ContactPage() {
+             blurb="Questions about how we handle your or your child&rsquo;s data."
+           />
+         </div>
++
++        <p className="mt-10 text-base text-warmbrown">
++          Found a bug or have a feature idea?{" "}
++          <Link href="/feedback" className="font-bold text-coral hover:underline">
++            Share it on our feedback page
++          </Link>
++          .
++        </p>
+       </main>
+       <Footer />
+     </>
+diff --git a/app/feedback/actions.ts b/app/feedback/actions.ts
+new file mode 100644
+index 0000000..074f457
+--- /dev/null
++++ b/app/feedback/actions.ts
+@@ -0,0 +1,150 @@
++"use server";
++
++import { cookies, headers } from "next/headers";
++import { revalidatePath } from "next/cache";
++import { getSupabaseServer } from "@/lib/supabase-server";
++
++export type FormResult = { ok: boolean; message: string };
++export type VoteResult = { ok: boolean; voted: boolean; voteCount: number };
++
++const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
++const VOTER_COOKIE = "px_voter";
++const GENERIC_ERROR = "Something went wrong. Please try again in a moment.";
++
++function str(fd: FormData, key: string) {
++  const v = fd.get(key);
++  return typeof v === "string" ? v.trim() : "";
++}
++
++function checkEmail(email: string): string | null {
++  if (!email) return "Please enter your email address.";
++  if (!EMAIL_RE.test(email) || email.length > 255) return "That doesn't look like a valid email.";
++  return null;
++}
++
++// Hidden "website" field — real people never fill it in, simple bots do.
++function isBot(fd: FormData) {
++  return str(fd, "website") !== "";
++}
++
++// ─── Bug reports ──────────────────────────────────────────────────────────────
++
++export async function submitBugReport(fd: FormData): Promise<FormResult> {
++  if (isBot(fd)) return { ok: true, message: "Thanks — we got your report." };
++
++  const email = str(fd, "email").toLowerCase();
++  const description = str(fd, "description");
++  const device = str(fd, "device").slice(0, 200) || null;
++  const appVersion = str(fd, "app_version").slice(0, 50) || null;
++
++  const emailError = checkEmail(email);
++  if (emailError) return { ok: false, message: emailError };
++  if (description.length < 10)
++    return { ok: false, message: "Please tell us a bit more about what happened." };
++  if (description.length > 5000)
++    return { ok: false, message: "That's a lot of detail! Please keep it under 5,000 characters." };
++
++  const supabase = getSupabaseServer();
++  if (!supabase) {
++    console.error("[bug_reports] Supabase not configured — report NOT stored.");
++    return { ok: false, message: GENERIC_ERROR };
++  }
++
++  const userAgent = (headers().get("user-agent") || "").slice(0, 500) || null;
++
++  const { error } = await supabase.from("bug_reports").insert({
++    email,
++    description,
++    device,
++    app_version: appVersion,
++    user_agent: userAgent,
++  });
++
++  if (error) {
++    console.error("[bug_reports] insert error:", error);
++    return { ok: false, message: GENERIC_ERROR };
++  }
++
++  return {
++    ok: true,
++    message: "Thanks — we got your report. We'll email you if we need more details.",
++  };
++}
++
++// ─── Feature requests ─────────────────────────────────────────────────────────
++
++export async function suggestFeature(fd: FormData): Promise<FormResult> {
++  if (isBot(fd)) return { ok: true, message: "Thanks for the idea!" };
++
++  const title = str(fd, "title");
++  const description = str(fd, "description") || null;
++  const email = str(fd, "email").toLowerCase();
++
++  if (title.length < 3) return { ok: false, message: "Please give your idea a short title." };
++  if (title.length > 120) return { ok: false, message: "Please keep the title under 120 characters." };
++  if (description && description.length > 1000)
++    return { ok: false, message: "Please keep the details under 1,000 characters." };
++  if (email) {
++    const emailError = checkEmail(email);
++    if (emailError) return { ok: false, message: emailError };
++  }
++
++  const supabase = getSupabaseServer();
++  if (!supabase) {
++    console.error("[feature_requests] Supabase not configured — suggestion NOT stored.");
++    return { ok: false, message: GENERIC_ERROR };
++  }
++
++  const { error } = await supabase.from("feature_requests").insert({
++    title,
++    description,
++    submitter_email: email || null,
++  });
++
++  if (error) {
++    console.error("[feature_requests] insert error:", error);
++    return { ok: false, message: GENERIC_ERROR };
++  }
++
++  return {
++    ok: true,
++    message: "Thanks for the idea! We review new suggestions before they appear on the list.",
++  };
++}
++
++// One anonymous id per browser, kept in an httpOnly cookie, so each visitor gets one vote
++// per feature. No login needed.
++function getOrCreateVoterId(): string {
++  const jar = cookies();
++  const existing = jar.get(VOTER_COOKIE)?.value;
++  if (existing && existing.length >= 16 && existing.length <= 64) return existing;
++  const id = crypto.randomUUID();
++  jar.set(VOTER_COOKIE, id, {
++    httpOnly: true,
++    sameSite: "lax",
++    secure: process.env.NODE_ENV === "production",
++    path: "/",
++    maxAge: 60 * 60 * 24 * 365 * 2,
++  });
++  return id;
++}
++
++export async function toggleVote(featureId: string): Promise<VoteResult> {
++  const supabase = getSupabaseServer();
++  if (!supabase) return { ok: false, voted: false, voteCount: 0 };
++
++  const voterId = getOrCreateVoterId();
++  const { data, error } = await supabase.rpc("toggle_feature_vote", {
++    p_feature_id: featureId,
++    p_voter_id: voterId,
++  });
++
++  const row = Array.isArray(data) ? data[0] : data;
++  if (error || !row) {
++    console.error("[feature_votes] toggle error:", error);
++    return { ok: false, voted: false, voteCount: 0 };
++  }
++
++  revalidatePath("/feedback");
++  return { ok: true, voted: !!row.voted, voteCount: Number(row.vote_count) || 0 };
++}
+diff --git a/app/feedback/page.tsx b/app/feedback/page.tsx
+new file mode 100644
+index 0000000..57bcba3
+--- /dev/null
++++ b/app/feedback/page.tsx
+@@ -0,0 +1,62 @@
++import type { Metadata } from "next";
++import Header from "@/components/Header";
++import Footer from "@/components/Footer";
++import BugReportForm from "@/components/BugReportForm";
++import FeatureRequests from "@/components/FeatureRequests";
++import { getFeatureRequests } from "@/lib/feedback";
++
++// Votes change often and each visitor sees their own votes highlighted.
++export const dynamic = "force-dynamic";
++
++export const metadata: Metadata = {
++  title: "Feedback",
++  description:
++    "Report a bug in the Pixley app, or suggest and vote on new features. See what other parents want most.",
++  alternates: { canonical: "https://usepixley.com/feedback" },
++  openGraph: {
++    type: "website",
++    url: "https://usepixley.com/feedback",
++    title: "Pixley feedback — report a bug or vote on features",
++    description: "Report a bug in the Pixley app, or suggest and vote on new features.",
++    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Pixley" }],
++  },
++};
++
++export default async function FeedbackPage() {
++  const { features, myVotes } = await getFeatureRequests();
++
++  return (
++    <>
++      <Header />
++      <main className="mx-auto max-w-3xl px-6 py-16">
++        <h1 className="text-4xl font-bold text-cocoa md:text-5xl">Feedback</h1>
++        <p className="mt-4 max-w-xl text-lg text-warmbrown">
++          Help us make Pixley better for your family. Tell us what&rsquo;s broken, or vote on
++          what we build next.
++        </p>
++
++        <section aria-labelledby="bug-heading" className="mt-12">
++          <div className="rounded-card border border-sand bg-cream p-6 md:p-8">
++            <h2 id="bug-heading" className="text-2xl font-bold text-cocoa md:text-3xl">
++              Report a bug
++            </h2>
++            <p className="mt-2 mb-6 text-sm text-warmbrown">
++              Something not working right? Let us know and we&rsquo;ll look into it.
++            </p>
++            <BugReportForm />
++          </div>
++        </section>
++
++        <section aria-labelledby="features-heading" className="mt-16">
++          <h2 id="features-heading" className="text-2xl font-bold text-cocoa md:text-3xl">
++            Feature requests
++          </h2>
++          <div className="mt-3">
++            <FeatureRequests initialFeatures={features} initialVotes={myVotes} />
++          </div>
++        </section>
++      </main>
++      <Footer />
++    </>
++  );
++}
+diff --git a/app/sitemap.ts b/app/sitemap.ts
+index b5201e6..b5e4f1d 100644
+--- a/app/sitemap.ts
++++ b/app/sitemap.ts
+@@ -41,6 +41,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+       changeFrequency: "yearly",
+       priority: 0.6,
+     },
++    {
++      url: `${base}/feedback`,
++      lastModified,
++      changeFrequency: "weekly",
++      priority: 0.5,
++    },
+     {
+       url: `${base}/privacypolicy`,
+       lastModified,
+diff --git a/components/BugReportForm.tsx b/components/BugReportForm.tsx
+new file mode 100644
+index 0000000..73fee7d
+--- /dev/null
++++ b/components/BugReportForm.tsx
+@@ -0,0 +1,136 @@
++"use client";
++
++import { useState, useTransition } from "react";
++import { submitBugReport, type FormResult } from "@/app/feedback/actions";
++
++const inputClass =
++  "w-full rounded-2xl border-2 border-sand bg-white px-4 py-3 text-base text-cocoa placeholder:text-warmbrown/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 transition-all disabled:opacity-60";
++
++export default function BugReportForm() {
++  const [pending, startTransition] = useTransition();
++  const [result, setResult] = useState<FormResult | null>(null);
++
++  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
++    e.preventDefault();
++    const form = e.currentTarget;
++    const fd = new FormData(form);
++    startTransition(async () => {
++      const res = await submitBugReport(fd);
++      setResult(res);
++      if (res.ok) form.reset();
++    });
++  }
++
++  if (result?.ok) {
++    return (
++      <div
++        role="status"
++        aria-live="polite"
++        className="rounded-card border-2 border-teal bg-teal/10 px-6 py-6 text-center"
++      >
++        <p className="text-xl font-bold text-teal">{result.message}</p>
++        <button
++          type="button"
++          onClick={() => setResult(null)}
++          className="mt-4 text-sm font-medium text-cocoa underline hover:text-coral"
++        >
++          Report another bug
++        </button>
++      </div>
++    );
++  }
++
++  return (
++    <form onSubmit={onSubmit} className="space-y-4" aria-label="Report a bug">
++      <div>
++        <label htmlFor="bug-email" className="mb-1.5 block text-sm font-bold text-cocoa">
++          Your email
++        </label>
++        <input
++          id="bug-email"
++          name="email"
++          type="email"
++          required
++          inputMode="email"
++          autoComplete="email"
++          placeholder="you@example.com"
++          disabled={pending}
++          className={inputClass}
++        />
++      </div>
++
++      <div>
++        <label htmlFor="bug-description" className="mb-1.5 block text-sm font-bold text-cocoa">
++          What went wrong?
++        </label>
++        <textarea
++          id="bug-description"
++          name="description"
++          required
++          minLength={10}
++          maxLength={5000}
++          rows={5}
++          placeholder="What were you doing, what did you expect, and what happened instead?"
++          disabled={pending}
++          className={`${inputClass} resize-y`}
++        />
++      </div>
++
++      <div className="grid gap-4 sm:grid-cols-2">
++        <div>
++          <label htmlFor="bug-device" className="mb-1.5 block text-sm font-bold text-cocoa">
++            Device <span className="font-normal text-warmbrown">(optional)</span>
++          </label>
++          <input
++            id="bug-device"
++            name="device"
++            type="text"
++            maxLength={200}
++            placeholder="e.g. iPhone 15, iOS 18"
++            disabled={pending}
++            className={inputClass}
++          />
++        </div>
++        <div>
++          <label htmlFor="bug-version" className="mb-1.5 block text-sm font-bold text-cocoa">
++            App version <span className="font-normal text-warmbrown">(optional)</span>
++          </label>
++          <input
++            id="bug-version"
++            name="app_version"
++            type="text"
++            maxLength={50}
++            placeholder="e.g. 1.0.3"
++            disabled={pending}
++            className={inputClass}
++          />
++        </div>
++      </div>
++
++      {/* Honeypot — hidden from people, catches simple spam bots */}
++      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
++        <label htmlFor="bug-website">Website</label>
++        <input id="bug-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
++      </div>
++
++      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
++        <p className="text-xs text-warmbrown">
++          We&rsquo;ll only use your email to follow up on this report.
++        </p>
++        <button
++          type="submit"
++          disabled={pending}
++          className="h-12 whitespace-nowrap rounded-full bg-coral px-7 text-base font-bold text-cream transition-opacity hover:opacity-90 disabled:opacity-60"
++        >
++          {pending ? "Sending…" : "Send bug report"}
++        </button>
++      </div>
++
++      {result && !result.ok && (
++        <p role="status" aria-live="polite" className="text-base font-medium text-coral">
++          {result.message}
++        </p>
++      )}
++    </form>
++  );
++}
+diff --git a/components/FeatureRequests.tsx b/components/FeatureRequests.tsx
+new file mode 100644
+index 0000000..6501f39
+--- /dev/null
++++ b/components/FeatureRequests.tsx
+@@ -0,0 +1,269 @@
++"use client";
++
++import { useMemo, useState, useTransition } from "react";
++import { suggestFeature, toggleVote, type FormResult } from "@/app/feedback/actions";
++import type { FeatureRequest, FeatureStatus } from "@/lib/feedback";
++
++const STATUS_LABEL: Record<FeatureStatus, { text: string; className: string } | null> = {
++  open: null,
++  planned: { text: "Planned", className: "bg-bluetint text-cocoa" },
++  in_progress: { text: "In progress", className: "bg-sunshine/40 text-cocoa" },
++  shipped: { text: "Shipped", className: "bg-greentint text-cocoa" },
++};
++
++function rank(list: FeatureRequest[]) {
++  // Shipped items drop to the bottom; everything else ranks by votes, then oldest first.
++  return [...list].sort((a, b) => {
++    const as = a.status === "shipped" ? 1 : 0;
++    const bs = b.status === "shipped" ? 1 : 0;
++    if (as !== bs) return as - bs;
++    if (b.voteCount !== a.voteCount) return b.voteCount - a.voteCount;
++    return a.createdAt.localeCompare(b.createdAt);
++  });
++}
++
++export default function FeatureRequests({
++  initialFeatures,
++  initialVotes,
++}: {
++  initialFeatures: FeatureRequest[];
++  initialVotes: string[];
++}) {
++  const [features, setFeatures] = useState(initialFeatures);
++  const [voted, setVoted] = useState(() => new Set(initialVotes));
++  const [busy, setBusy] = useState<string | null>(null);
++  const [voteError, setVoteError] = useState(false);
++  const [showForm, setShowForm] = useState(false);
++
++  const ranked = useMemo(() => rank(features), [features]);
++
++  async function onVote(f: FeatureRequest) {
++    if (busy || f.status === "shipped") return;
++    setVoteError(false);
++    setBusy(f.id);
++
++    // Optimistic update
++    const wasVoted = voted.has(f.id);
++    const apply = (isVoted: boolean, count: number) => {
++      setVoted((prev) => {
++        const next = new Set(prev);
++        if (isVoted) next.add(f.id);
++        else next.delete(f.id);
++        return next;
++      });
++      setFeatures((prev) => prev.map((x) => (x.id === f.id ? { ...x, voteCount: count } : x)));
++    };
++    apply(!wasVoted, f.voteCount + (wasVoted ? -1 : 1));
++
++    const res = await toggleVote(f.id);
++    if (res.ok) apply(res.voted, res.voteCount);
++    else {
++      apply(wasVoted, f.voteCount);
++      setVoteError(true);
++    }
++    setBusy(null);
++  }
++
++  return (
++    <div>
++      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
++        <p className="text-sm text-warmbrown">
++          Vote for the ideas you want most. The list is ranked by votes.
++        </p>
++        {!showForm && (
++          <button
++            type="button"
++            onClick={() => setShowForm(true)}
++            className="h-11 self-start whitespace-nowrap rounded-full border-2 border-coral px-5 text-sm font-bold text-coral transition-colors hover:bg-coraltint sm:self-auto"
++          >
++            + Suggest a feature
++          </button>
++        )}
++      </div>
++
++      {showForm && <SuggestForm onClose={() => setShowForm(false)} />}
++
++      {voteError && (
++        <p role="status" className="mt-4 text-sm font-medium text-coral">
++          Your vote didn&rsquo;t go through. Please try again.
++        </p>
++      )}
++
++      {ranked.length === 0 ? (
++        <div className="mt-8 rounded-card border border-dashed border-sand bg-cream p-10 text-center">
++          <p className="text-lg font-bold text-cocoa">No feature requests yet</p>
++          <p className="mt-2 text-sm text-warmbrown">
++            Have an idea for Pixley? Be the first to suggest one.
++          </p>
++        </div>
++      ) : (
++        <ol className="mt-8 space-y-3">
++          {ranked.map((f, i) => {
++            const isVoted = voted.has(f.id);
++            const badge = STATUS_LABEL[f.status];
++            const shipped = f.status === "shipped";
++            return (
++              <li
++                key={f.id}
++                className="flex items-start gap-4 rounded-card border border-sand bg-white/60 p-4 sm:p-5"
++              >
++                <button
++                  type="button"
++                  onClick={() => onVote(f)}
++                  disabled={shipped || busy === f.id}
++                  aria-pressed={isVoted}
++                  aria-label={`${isVoted ? "Remove your vote for" : "Vote for"} ${f.title}. ${f.voteCount} ${f.voteCount === 1 ? "vote" : "votes"}.`}
++                  className={`flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-2xl border-2 transition-colors ${
++                    isVoted
++                      ? "border-coral bg-coral text-cream"
++                      : "border-sand bg-cream text-cocoa hover:border-coral"
++                  } ${shipped ? "cursor-default opacity-60" : ""}`}
++                >
++                  <svg viewBox="0 0 12 8" className="h-2.5 w-3.5" aria-hidden="true">
++                    <path d="M6 0 12 8H0z" fill="currentColor" />
++                  </svg>
++                  <span className="mt-1 text-lg font-bold leading-none">{f.voteCount}</span>
++                </button>
++
++                <div className="min-w-0 flex-1 pt-1">
++                  <div className="flex flex-wrap items-center gap-2">
++                    <span className="text-xs font-bold text-warmbrown">#{i + 1}</span>
++                    <h3 className="text-base font-bold text-cocoa sm:text-lg">{f.title}</h3>
++                    {badge && (
++                      <span
++                        className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${badge.className}`}
++                      >
++                        {badge.text}
++                      </span>
++                    )}
++                  </div>
++                  {f.description && (
++                    <p className="mt-1 whitespace-pre-line text-sm text-warmbrown">
++                      {f.description}
++                    </p>
++                  )}
++                </div>
++              </li>
++            );
++          })}
++        </ol>
++      )}
++    </div>
++  );
++}
++
++function SuggestForm({ onClose }: { onClose: () => void }) {
++  const [pending, startTransition] = useTransition();
++  const [result, setResult] = useState<FormResult | null>(null);
++
++  const inputClass =
++    "w-full rounded-2xl border-2 border-sand bg-white px-4 py-3 text-base text-cocoa placeholder:text-warmbrown/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/30 transition-all disabled:opacity-60";
++
++  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
++    e.preventDefault();
++    const fd = new FormData(e.currentTarget);
++    startTransition(async () => setResult(await suggestFeature(fd)));
++  }
++
++  if (result?.ok) {
++    return (
++      <div
++        role="status"
++        aria-live="polite"
++        className="mt-6 rounded-card border-2 border-teal bg-teal/10 px-6 py-5 text-center"
++      >
++        <p className="text-lg font-bold text-teal">{result.message}</p>
++        <button
++          type="button"
++          onClick={onClose}
++          className="mt-3 text-sm font-medium text-cocoa underline hover:text-coral"
++        >
++          Close
++        </button>
++      </div>
++    );
++  }
++
++  return (
++    <form
++      onSubmit={onSubmit}
++      aria-label="Suggest a feature"
++      className="mt-6 space-y-4 rounded-card border-2 border-coral bg-coraltint/40 p-5 sm:p-6"
++    >
++      <div>
++        <label htmlFor="fr-title" className="mb-1.5 block text-sm font-bold text-cocoa">
++          Your idea
++        </label>
++        <input
++          id="fr-title"
++          name="title"
++          type="text"
++          required
++          minLength={3}
++          maxLength={120}
++          placeholder="e.g. Separate profiles for each kid"
++          disabled={pending}
++          className={inputClass}
++        />
++      </div>
++      <div>
++        <label htmlFor="fr-description" className="mb-1.5 block text-sm font-bold text-cocoa">
++          Details <span className="font-normal text-warmbrown">(optional)</span>
++        </label>
++        <textarea
++          id="fr-description"
++          name="description"
++          rows={3}
++          maxLength={1000}
++          placeholder="How would it help your family?"
++          disabled={pending}
++          className={`${inputClass} resize-y`}
++        />
++      </div>
++      <div>
++        <label htmlFor="fr-email" className="mb-1.5 block text-sm font-bold text-cocoa">
++          Email <span className="font-normal text-warmbrown">(optional, never shown publicly)</span>
++        </label>
++        <input
++          id="fr-email"
++          name="email"
++          type="email"
++          inputMode="email"
++          autoComplete="email"
++          placeholder="you@example.com"
++          disabled={pending}
++          className={inputClass}
++        />
++      </div>
++
++      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
++        <label htmlFor="fr-website">Website</label>
++        <input id="fr-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
++      </div>
++
++      {result && !result.ok && (
++        <p role="status" aria-live="polite" className="text-sm font-medium text-coral">
++          {result.message}
++        </p>
++      )}
++
++      <div className="flex items-center justify-end gap-3">
++        <button
++          type="button"
++          onClick={onClose}
++          disabled={pending}
++          className="h-11 rounded-full px-5 text-sm font-medium text-cocoa hover:bg-sand/60"
++        >
++          Cancel
++        </button>
++        <button
++          type="submit"
++          disabled={pending}
++          className="h-11 rounded-full bg-coral px-6 text-sm font-bold text-cream transition-opacity hover:opacity-90 disabled:opacity-60"
++        >
++          {pending ? "Sending…" : "Submit idea"}
++        </button>
++      </div>
++    </form>
++  );
++}
+diff --git a/components/Footer.tsx b/components/Footer.tsx
+index 5c3a917..1f367f6 100644
+--- a/components/Footer.tsx
++++ b/components/Footer.tsx
+@@ -47,6 +47,12 @@ export default function Footer() {
+             >
+               Contact
+             </Link>
++            <Link
++              href="/feedback"
++              className="text-cocoa hover:text-coral transition-colors"
++            >
++              Feedback
++            </Link>
+             <Link
+               href="/privacypolicy"
+               className="text-cocoa hover:text-coral transition-colors"
+diff --git a/lib/feedback.ts b/lib/feedback.ts
+new file mode 100644
+index 0000000..3c6cf19
+--- /dev/null
++++ b/lib/feedback.ts
+@@ -0,0 +1,56 @@
++import { cookies } from "next/headers";
++import { getSupabaseServer } from "@/lib/supabase-server";
++
++export type FeatureStatus = "open" | "planned" | "in_progress" | "shipped";
++
++export type FeatureRequest = {
++  id: string;
++  title: string;
++  description: string | null;
++  status: FeatureStatus;
++  voteCount: number;
++  createdAt: string;
++};
++
++// Loads the public, ranked feature list plus which items this browser has voted on.
++// Returns an empty list (rather than throwing) if Supabase isn't reachable, so the
++// rest of the page still renders.
++export async function getFeatureRequests(): Promise<{
++  features: FeatureRequest[];
++  myVotes: string[];
++}> {
++  const supabase = getSupabaseServer();
++  if (!supabase) return { features: [], myVotes: [] };
++
++  const voterId = cookies().get("px_voter")?.value;
++
++  const [list, votes] = await Promise.all([
++    supabase
++      .from("feature_requests")
++      .select("id, title, description, status, vote_count, created_at")
++      .order("vote_count", { ascending: false })
++      .order("created_at", { ascending: true })
++      .limit(200),
++    voterId
++      ? supabase.rpc("my_feature_votes", { p_voter_id: voterId })
++      : Promise.resolve({ data: [] as string[], error: null }),
++  ]);
++
++  if (list.error) console.error("[feature_requests] select error:", list.error);
++  if (votes.error) console.error("[feature_votes] my votes error:", votes.error);
++
++  const features: FeatureRequest[] = (list.data ?? []).map((r) => ({
++    id: r.id,
++    title: r.title,
++    description: r.description,
++    status: r.status as FeatureStatus,
++    voteCount: r.vote_count,
++    createdAt: r.created_at,
++  }));
++
++  const myVotes = ((votes.data ?? []) as unknown[]).map((v) =>
++    typeof v === "string" ? v : String((v as Record<string, unknown>).my_feature_votes ?? "")
++  );
++
++  return { features, myVotes };
++}
+diff --git a/supabase/feedback.sql b/supabase/feedback.sql
+new file mode 100644
+index 0000000..1075a7e
+--- /dev/null
++++ b/supabase/feedback.sql
+@@ -0,0 +1,139 @@
++-- Pixley website — /feedback page tables
++-- Run once in Supabase → SQL Editor. Safe to re-run.
++--
++-- What this creates:
++--   bug_reports        — private. The public can insert, nobody can read via the anon key.
++--   feature_requests   — public list. Anyone can read approved items (never the submitter's
++--                        email). New suggestions land as 'pending' until you approve them.
++--   feature_votes      — private. One vote per (feature, browser). Only touched via RPCs.
++--   toggle_feature_vote(feature_id, voter_id) — vote / un-vote, returns the new count.
++--   my_feature_votes(voter_id)                — which features this browser has voted on.
++--
++-- Moderating: in Table Editor → feature_requests, change status from 'pending' to 'open'
++-- to publish a suggestion. Other statuses ('planned', 'in_progress', 'shipped') show as
++-- badges on the site. 'declined' and 'pending' are hidden.
++
++-- ─── Bug reports ─────────────────────────────────────────────────────────────
++create table if not exists public.bug_reports (
++  id          uuid primary key default gen_random_uuid(),
++  created_at  timestamptz not null default now(),
++  email       text not null check (char_length(email) between 3 and 255),
++  description text not null check (char_length(description) between 10 and 5000),
++  device      text check (device is null or char_length(device) <= 200),
++  app_version text check (app_version is null or char_length(app_version) <= 50),
++  user_agent  text check (user_agent is null or char_length(user_agent) <= 500),
++  status      text not null default 'new'
++              check (status in ('new', 'triaged', 'fixed', 'wont_fix', 'duplicate'))
++);
++
++alter table public.bug_reports enable row level security;
++
++drop policy if exists "public can submit bug reports" on public.bug_reports;
++create policy "public can submit bug reports"
++  on public.bug_reports for insert
++  to anon, authenticated
++  with check (status = 'new');
++-- No select/update/delete policies → reports are only visible to you in the dashboard.
++
++-- ─── Feature requests ────────────────────────────────────────────────────────
++create table if not exists public.feature_requests (
++  id              uuid primary key default gen_random_uuid(),
++  created_at      timestamptz not null default now(),
++  title           text not null check (char_length(title) between 3 and 120),
++  description     text check (description is null or char_length(description) <= 1000),
++  status          text not null default 'pending'
++                  check (status in ('pending', 'open', 'planned', 'in_progress', 'shipped', 'declined')),
++  vote_count      integer not null default 0,
++  submitter_email text check (submitter_email is null or char_length(submitter_email) <= 255)
++);
++
++create index if not exists feature_requests_rank_idx
++  on public.feature_requests (vote_count desc, created_at asc);
++
++alter table public.feature_requests enable row level security;
++
++drop policy if exists "public can read published feature requests" on public.feature_requests;
++create policy "public can read published feature requests"
++  on public.feature_requests for select
++  to anon, authenticated
++  using (status in ('open', 'planned', 'in_progress', 'shipped'));
++
++drop policy if exists "public can suggest features" on public.feature_requests;
++create policy "public can suggest features"
++  on public.feature_requests for insert
++  to anon, authenticated
++  with check (status = 'pending' and vote_count = 0);
++
++-- Column-level privacy: the public can read everything EXCEPT submitter_email.
++revoke select on public.feature_requests from anon, authenticated;
++grant select (id, created_at, title, description, status, vote_count)
++  on public.feature_requests to anon, authenticated;
++revoke insert on public.feature_requests from anon, authenticated;
++grant insert (title, description, submitter_email)
++  on public.feature_requests to anon, authenticated;
++
++-- ─── Votes ───────────────────────────────────────────────────────────────────
++create table if not exists public.feature_votes (
++  feature_id uuid not null references public.feature_requests(id) on delete cascade,
++  voter_id   text not null check (char_length(voter_id) between 16 and 64),
++  created_at timestamptz not null default now(),
++  primary key (feature_id, voter_id)
++);
++
++alter table public.feature_votes enable row level security;
++-- No policies on purpose: the anon key can't read or write votes directly.
++-- All access goes through the security-definer functions below.
++
++create or replace function public.toggle_feature_vote(p_feature_id uuid, p_voter_id text)
++returns table (voted boolean, vote_count integer)
++language plpgsql
++security definer
++set search_path = public
++as $$
++declare
++  v_deleted int;
++begin
++  if p_voter_id is null or char_length(p_voter_id) not between 16 and 64 then
++    raise exception 'invalid voter id';
++  end if;
++
++  -- Only published items can be voted on.
++  perform 1 from feature_requests fr
++   where fr.id = p_feature_id
++     and fr.status in ('open', 'planned', 'in_progress')
++   for update;
++  if not found then
++    raise exception 'feature not found';
++  end if;
++
++  delete from feature_votes fv
++   where fv.feature_id = p_feature_id and fv.voter_id = p_voter_id;
++  get diagnostics v_deleted = row_count;
++
++  if v_deleted = 0 then
++    insert into feature_votes (feature_id, voter_id) values (p_feature_id, p_voter_id);
++  end if;
++
++  update feature_requests fr
++     set vote_count = (select count(*) from feature_votes fv where fv.feature_id = p_feature_id)
++   where fr.id = p_feature_id;
++
++  return query
++    select (v_deleted = 0), fr.vote_count from feature_requests fr where fr.id = p_feature_id;
++end;
++$$;
++
++create or replace function public.my_feature_votes(p_voter_id text)
++returns setof uuid
++language sql
++stable
++security definer
++set search_path = public
++as $$
++  select fv.feature_id from feature_votes fv where fv.voter_id = p_voter_id;
++$$;
++
++revoke all on function public.toggle_feature_vote(uuid, text) from public;
++revoke all on function public.my_feature_votes(text) from public;
++grant execute on function public.toggle_feature_vote(uuid, text) to anon, authenticated;
++grant execute on function public.my_feature_votes(text) to anon, authenticated;
+-- 
+2.43.0
+

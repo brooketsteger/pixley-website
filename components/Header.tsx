@@ -18,6 +18,12 @@ export default function Header() {
         </Link>
         <nav className="flex items-center gap-1.5 sm:gap-3">
           <Link
+            href="/about"
+            className="hidden rounded-full px-3 py-2 sm:inline-block text-sm font-medium text-cocoa hover:bg-sand/60 transition-colors sm:px-4"
+          >
+            About
+          </Link>
+          <Link
             href="/blog"
             className="rounded-full px-3 py-2 text-sm font-medium text-cocoa hover:bg-sand/60 transition-colors sm:px-4"
           >

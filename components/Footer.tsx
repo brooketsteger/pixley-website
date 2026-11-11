@@ -39,13 +39,23 @@ export default function Footer() {
             >
               Blog
             </Link>
-            {/* Inactive placeholder item — kept for layout parity with Figma Sites */}
-            <span className="text-warmbrown/70">About Us</span>
+            <Link
+              href="/about"
+              className="text-cocoa hover:text-coral transition-colors"
+            >
+              About Us
+            </Link>
             <Link
               href="/contact"
               className="text-cocoa hover:text-coral transition-colors"
             >
               Contact
+            </Link>
+            <Link
+              href="/faq"
+              className="text-cocoa hover:text-coral transition-colors"
+            >
+              FAQ
             </Link>
             <Link
               href="/privacypolicy"
@@ -61,6 +71,24 @@ export default function Footer() {
             </Link>
           </nav>
         </div>
+
+        <nav
+          aria-label="Guides"
+          className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm md:justify-start"
+        >
+          <Link href="/block-youtube-shorts-for-kids" className="text-warmbrown hover:text-coral transition-colors">
+            Block YouTube Shorts for kids
+          </Link>
+          <Link href="/youtube-kids-alternative" className="text-warmbrown hover:text-coral transition-colors">
+            YouTube Kids alternative
+          </Link>
+          <Link href="/pixley-vs-youtube-kids" className="text-warmbrown hover:text-coral transition-colors">
+            Pixley vs YouTube Kids
+          </Link>
+          <Link href="/pixley-vs-bark-qustodio" className="text-warmbrown hover:text-coral transition-colors">
+            Pixley vs Bark and Qustodio
+          </Link>
+        </nav>
 
         <div className="mt-10 border-t border-sand pt-6 text-center text-xs text-warmbrown">
           © {new Date().getFullYear()} Pixley. All rights reserved.

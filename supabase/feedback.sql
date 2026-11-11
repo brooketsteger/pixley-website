@@ -28,6 +28,12 @@ create table if not exists public.bug_reports (
 
 alter table public.bug_reports enable row level security;
 
+-- Explicit grants (newer Supabase projects don't auto-expose new tables to the API).
+grant usage on schema public to anon, authenticated;
+revoke all on public.bug_reports from anon, authenticated;
+grant insert (email, description, device, app_version, user_agent)
+  on public.bug_reports to anon, authenticated;
+
 drop policy if exists "public can submit bug reports" on public.bug_reports;
 create policy "public can submit bug reports"
   on public.bug_reports for insert
@@ -114,8 +120,9 @@ begin
     insert into feature_votes (feature_id, voter_id) values (p_feature_id, p_voter_id);
   end if;
 
+  -- Add/subtract one (rather than recounting) so a starting count you set by hand is kept.
   update feature_requests fr
-     set vote_count = (select count(*) from feature_votes fv where fv.feature_id = p_feature_id)
+     set vote_count = greatest(fr.vote_count + case when v_deleted = 0 then 1 else -1 end, 0)
    where fr.id = p_feature_id;
 
   return query

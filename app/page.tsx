@@ -18,10 +18,10 @@ export default function HomePage() {
               </p>
               <h1 className="mt-4 text-4xl font-bold leading-tight text-cocoa md:text-6xl">
                 Parental controls for{" "}
-                <span className="text-coral">Shorts &amp; Reels</span>
+                <span className="text-coral">YouTube Shorts</span>
               </h1>
               <p className="mt-6 max-w-md text-lg text-warmbrown">
-                A streaming app where you approve every channel.
+                An app where you approve every YouTube channel.
                 No algorithm. No fear. Just the videos you&rsquo;ve said yes to.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">

@@ -14,15 +14,15 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL("https://usepixley.com"),
   title: {
-    default: "Pixley — Parental Controls for Shorts & Reels",
+    default: "Pixley — Parental Controls for YouTube Shorts",
     template: "%s | Pixley",
   },
   description:
-    "Pixley is a kid-safe streaming app where parents approve every channel and creator. No algorithm, no suggested content — just the videos you've said yes to.",
+    "Pixley is an app where kids watch YouTube videos and Shorts only from channels their parent has approved, with time limits, the ability to disable Shorts and no algorithm.",
   keywords: [
     "parental controls",
     "kid safe shorts",
-    "kid safe reels",
+    "block youtube shorts",
     "youtube for kids",
     "screen time",
     "parent approved content",
@@ -50,23 +50,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://usepixley.com",
     siteName: "Pixley",
-    title: "Pixley — Parental Controls for Shorts & Reels",
+    title: "Pixley — Parental Controls for YouTube Shorts",
     description:
-      "A kid-safe streaming app where parents approve every channel and creator. No algorithm, no suggested content.",
+      "Pixley is an app where kids watch YouTube videos and Shorts only from channels their parent has approved, with time limits, the ability to disable Shorts and no algorithm.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Pixley — Parental Controls for Shorts & Reels",
+        alt: "Pixley — Parental Controls for YouTube Shorts",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pixley — Parental Controls for Shorts & Reels",
+    title: "Pixley — Parental Controls for YouTube Shorts",
     description:
-      "A kid-safe streaming app where parents approve every channel and creator.",
+      "Pixley is an app where kids watch YouTube videos and Shorts only from channels their parent has approved, with time limits, the ability to disable Shorts and no algorithm.",
     images: ["/og-image.png"],
   },
   icons: {
@@ -97,7 +97,7 @@ export default function RootLayout({
     url: "https://usepixley.com",
     logo: "https://usepixley.com/logo.png",
     description:
-      "Pixley is a kid-safe streaming platform where parents control every channel and content source available to their children.",
+      "Pixley is an app where kids watch YouTube videos and Shorts only from channels their parent has approved, with time limits, the ability to disable Shorts and no algorithm.",
     contactPoint: {
       "@type": "ContactPoint",
       email: "support@usepixley.com",
@@ -115,7 +115,7 @@ export default function RootLayout({
     downloadUrl: APP_STORE_URL,
     installUrl: APP_STORE_URL,
     description:
-      "Parental controls for short-form video. Parents approve every creator. No algorithm, no suggested content.",
+      "Pixley is an app where kids watch YouTube videos and Shorts only from channels their parent has approved, with time limits, the ability to disable Shorts and no algorithm.",
     offers: {
       "@type": "Offer",
       price: "0",
